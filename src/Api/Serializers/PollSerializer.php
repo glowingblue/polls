@@ -30,6 +30,13 @@ class PollSerializer extends AbstractSerializer
      */
     protected function getDefaultAttributes($poll)
     {
+        $votesCount = 0;
+        $poll->options()->chunkById(100, function ($options) use(&$votesCount) {
+            foreach ($options as $option) {
+                $votesCount = $votesCount + $option->votes()->count();
+            }
+        });
+
         return [
             'question'    => $poll->question,
             'hasEnded'    => $poll->hasEnded(),
@@ -37,6 +44,7 @@ class PollSerializer extends AbstractSerializer
             'endDate'     => $this->formatDate($poll->end_date),
             'createdAt'   => $this->formatDate($poll->created_at),
             'updatedAt'   => $this->formatDate($poll->updated_at),
+            'votesCount'  => $votesCount,
         ];
     }
 

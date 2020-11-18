@@ -99,6 +99,11 @@ class Poll extends AbstractModel
      */
     public function votes()
     {
-        return $this->hasMany(PollVote::class);
+        return $this->hasMany(PollVote::class)->whereHas('user', function ($query) {
+            // !!!!! CAREFUL !!!!!!
+            // app('flarum.actor') only work because of the ActorBindingMiddleware in glowingblue/orell-rezensionen
+            $actor = app('flarum.actor');
+            $query->where('id', $actor->id);
+        });
     }
 }

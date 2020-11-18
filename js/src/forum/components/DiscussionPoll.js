@@ -26,8 +26,8 @@ export default class PollVote extends Component {
                         this.vote()
                             .option()
                             .id() === opt.id();
-                    const votes = this.votes.filter(v => v.option().id() === opt.id()).length;
-                    const percent = Math.round((votes / this.poll.votes().length) * 100);
+                    const votes = opt.votesCount();
+                    const percent = Math.round((votes / this.poll.votesCount()) * 100);
 
                     const attrs = voted
                         ? {
@@ -70,14 +70,6 @@ export default class PollVote extends Component {
                 })}
 
                 <div style="clear: both;" />
-
-                {this.poll.publicPoll()
-                    ? Button.component({
-                          className: 'Button Button--primary PublicPollButton',
-                          children: app.translator.trans('fof-polls.forum.public_poll'),
-                          onclick: () => this.showVoters(),
-                      })
-                    : ''}
 
                 {app.session.user && !app.session.user.canVotePolls() ? (
                     <div className="helpText PollInfoText">{app.translator.trans('fof-polls.forum.no_permission')}</div>
@@ -151,11 +143,10 @@ export default class PollVote extends Component {
 
             this.updateData();
 
-            if (!option) {
-                m.redraw.strategy('all');
-                m.redraw();
-                m.redraw.strategy('diff');
-            }
+            // Always redraw, else it could happen that the user votes and doesn't see any UI feedback.
+            m.redraw.strategy('all');
+            m.redraw();
+            m.redraw.strategy('diff');
 
             m.endComputation();
         });

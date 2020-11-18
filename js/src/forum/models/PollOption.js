@@ -6,6 +6,7 @@ export default class PollOption extends mixin(Model, {
 
     poll: Model.hasOne('polls'),
     votes: Model.hasMany('votes'),
+    votesCount: Model.attribute('votesCount'),
 }) {
     apiEndpoint() {
         return `/fof/polls/answers${this.exists ? `/${this.data.id}` : ''}`;
